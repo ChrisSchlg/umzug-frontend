@@ -1,13 +1,21 @@
 import { test, expect } from 'playwright/test';
 
 test('move items', async ({ page }) => {
-    await page.route('**/api/umzug', async (route, request) => {
-        expect(request.url()).toContain('/api/umzug');
+    let requestRecieved = false;
 
+    await page.route('**/api/umzug', async (route, request) => {
+        requestRecieved = true;
         expect(request.method()).toBe('POST');
 
         const postData = request.postDataJSON();
-        expect(postData).toContain({ text: 'xxx'});
+        expect(postData).toEqual({
+            name: 'xxx',
+            time: 'xxx',
+            origin: 'xxx',
+            destination: 'xxx',
+            item: 'xxx',
+            amount: 'xxx'
+        });
 
         await route.fulfill({
             status: 200
@@ -22,7 +30,7 @@ test('move items', async ({ page }) => {
     const inputDestination = page.getByPlaceholder('Enter Destination');
     const inputItem = page.getByPlaceholder('Enter Item');
     const inputAmount = page.getByPlaceholder('Enter Amount');
-    const addButton = page.getByRole('button', { name: 'Add' });
+    const addButton = page.getByRole('button', { name: 'Hinzufuegen' });
 
     await expect(inputName).toBeVisible();
     await expect(inputTime).toBeVisible();
@@ -40,5 +48,5 @@ test('move items', async ({ page }) => {
     await inputAmount.fill('xxx');
     await addButton.click();
 
-    await expect(page.getByText('xxx')).toBeVisible();
+    expect(requestRecieved).toBe(true);
 })
