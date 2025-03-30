@@ -40,7 +40,10 @@ export class AppComponent {
       this.item,
       this.amount
     ).subscribe({
-
+      error: (err) => {
+        console.error(err);
+        this.errorMessage = 'Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.';
+      }
     })
   }
 }
