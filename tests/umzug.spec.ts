@@ -50,3 +50,23 @@ test('move items', async ({ page }) => {
 
     expect(requestRecieved).toBe(true);
 })
+
+test('error message when fields are empty not send request', async ({ page }) => {
+    let requestReceived = false;
+
+    await page.route('**/api/umzug', async (route) => {
+        requestReceived = true;
+        await route.abort();
+    });
+
+    await page.goto('http://localhost:4200/');
+
+    const addButton = page.getByRole('button', { name: 'Hinzufuegen' });
+
+    await addButton.click();
+
+    const errorMessage = page.getByText('Bitte füllen Sie alle Felder aus.');
+    await expect(errorMessage).toBeVisible();
+
+    expect(requestReceived).toBe(false);
+});
