@@ -15,4 +15,6 @@
 <br>
 <button (click)="createRequest()">Hinzufuegen</button>
 
+<p *ngIf="errorMessage" style="color: red;">{{ errorMessage }}</p>
+
 <router-outlet />
