@@ -1,4 +1,6 @@
 import { test, expect } from 'playwright/test';
+import { MainPage } from './pages/MainPage';
+
 
 test('move items', async ({ page }) => {
     let requestRecieved = false;
@@ -104,4 +106,34 @@ test('should show error message when backend request fails', async ({ page }) =>
 
     const errorMessage = page.getByText('Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.');
     await expect(errorMessage).toBeVisible();
+});
+
+test('should show error message when backend request fails pom version', async ({ page }) => {
+    let requestReceived = false;
+  
+    await page.route('**/api/umzug', async (route) => {
+        requestReceived = true;
+        await route.fulfill({
+            status: 500,
+            body: JSON.stringify({ message: 'Server error' }),
+        });
+    });
+  
+    const mainPage = new MainPage(page);
+  
+    await mainPage.navigate();
+    await mainPage.fillForm({
+        name: 'xxx',
+        time: 'xxx',
+        origin: 'xxx',
+        destination: 'xxx',
+        item: 'xxx',
+        amount: 'xxx',
+    });
+  
+    await mainPage.submitForm();
+  
+    expect(requestReceived).toBe(true);
+  
+    await mainPage.expectErrorMessageVisible();
 });
